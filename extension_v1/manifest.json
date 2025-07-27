@@ -1,0 +1,14 @@
+{
+    "manifest_version": 3,
+    "name": "SB_Wiz.pq Search Extractor",
+    "version": "1.0",
+    "description": "Extracts 'sb_wiz.pq' from local storage on search result pages.",
+    "permissions": ["tabs", "scripting", "notifications", "storage"],
+    "host_permissions": ["<all_urls>"],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "action": {
+      "default_title": "SB_Wiz.pq Extractor"
+    }
+  }
