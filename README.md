@@ -29,4 +29,6 @@ Building off the `RedGiraffe`, this approach obtains session info via a browser 
 - Explore ideal language models for the application
 - Look into a tool that categories fallacies in statements
   - Would prove useful to develop a tool that creates a score for vagueness
+  - Paper on logical fallacy detection with LMs: [Paper](https://arxiv.org/html/2503.23363v1#S4)
+  - Create the ideal prompt to fine tune the LM for the task
 
