@@ -21,3 +21,12 @@ Building off the `RedGiraffe`, this approach obtains session info via a browser 
 #### Up next:
 - Explore `background.js` capabilities and attempt to send text without encountering a `CORS` fault.
 - Setup a simple server that can accept the text and do some simple transformation.
+
+#### Checkpoints reached as of 7/28 :
+1) Background.js sends the text to a (and the URL) to a server running on node.js
+
+#### Up next:
+- Explore ideal language models for the application
+- Look into a tool that categories fallacies in statements
+  - Would prove useful to develop a tool that creates a score for vagueness
+
