@@ -32,3 +32,8 @@ Building off the `RedGiraffe`, this approach obtains session info via a browser 
   - Paper on logical fallacy detection with LMs: [Paper](https://arxiv.org/html/2503.23363v1#S4)
   - Create the ideal prompt to fine tune the LM for the task
 
+#### Checkpoints reached as of 7/29 :
+1) Ollama hosted on AWS with a secure connection over SSM.
+2) Docker installed and fucntional on hosted instance
+3) Open WebUI is funtional although it might not be the ideal way to query
+4) A general idea of the vague score generator algorithm conceptualized.
