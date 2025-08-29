@@ -9,7 +9,7 @@ app = FastAPI()
 
 class Query(BaseModel):
     prompt: str
-    model: str = "llama2"
+    model: str = "llama3.2"
     stream: Optional[bool] = True  # Default to streaming
 
 

@@ -33,7 +33,7 @@ function getSearchQuery(url) {
 
 // Function to query Ollama and launch a new tab
 async function queryOllamaAndLaunchTab(tabId, combinedPrompt) {
-    chrome.action.setBadgeText({ text: 'AI..', tabId: tabId });
+    // chrome.action.setBadgeText({ text: 'AI..', tabId: tabId });
     chrome.action.setBadgeBackgroundColor({ color: '#8A2BE2', tabId: tabId });
 
     try {
@@ -61,13 +61,13 @@ async function queryOllamaAndLaunchTab(tabId, combinedPrompt) {
                 // Launch a new tab with the search query
                 await chrome.tabs.create({ url: searchUrl });
 
-                const badgeText = ollamaResponseText.substring(0, 4).toUpperCase();
-                chrome.action.setBadgeText({ text: badgeText, tabId: tabId });
-                chrome.action.setBadgeBackgroundColor({ color: '#008000', tabId: tabId });
+                // const badgeText = ollamaResponseText.substring(0, 4).toUpperCase();
+                // chrome.action.setBadgeText({ text: badgeText, tabId: tabId });
+                // chrome.action.setBadgeBackgroundColor({ color: '#008000', tabId: tabId });
             } else {
                  console.error("[Extension] Ollama returned an empty or invalid response.");
-                 chrome.action.setBadgeText({ text: 'NoQR', tabId: tabId });
-                 chrome.action.setBadgeBackgroundColor({ color: '#FF4500', tabId: tabId }); // Orange-red for no query
+                //  chrome.action.setBadgeText({ text: 'NoQR', tabId: tabId });
+                //  chrome.action.setBadgeBackgroundColor({ color: '#FF4500', tabId: tabId }); // Orange-red for no query
             }
 
             return { success: true };
@@ -141,9 +141,32 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         const currentTabId = currentTabs[0].id;
 
         // Construct a prompt for Ollama to generate a search query
-        const combinedPrompt = `Transform this search query: '${keyVal}', With this provided context: '${request.text}', try to generate a hollistic search query to yeild more objective search results. ONLY RESPOND WITH THE TRANSFORMED SEARCH QUERY. DO NOT RESPOND WITH ANY TEXT OR EXPLANATION OF THE ANSWER FOR THIS QUERY. `;
+        const combinedPrompt = `Instruction: You are a helpful assistant. This is a query extracted during a web search session. The goal is to review the query, transform it with context and send an output. Here is a more detailed explanation of what is required:
+                                Upon receiving a query, you only need to transform it with the help of context provided. You must not answer the query, do not summarize, and do not provide any additional information. Your task is to transform the query try into a hollistic search query only.
+                                Example of transformed queries: 
+                                
+                                    Input Query: What about for endurance athletes? 
+                                    Input Context: Nutrition
+                                    Output Query: What nutritional strategies are most effective for endurance athletes?	
+
+                                    Input Query: Which position is hardest? 
+                                    Input Context: Hockey
+                                    Output Query: Which position in hockey is considered the most difficult to play and why?	
+                                    
+                                    Input Query: What social factors matter most?
+                                    Input Context: Life Span
+                                    Output Query: What social factors matter most for healthy aging and longevity?	
+
+                                    Input Query: Where is it headed next? 
+                                    Input Context: Telehealth
+                                    Output Query: What are the upcoming trends and future developments in telehealth technology?	
+
+                                    Input Query: What are the main causes? 
+                                    Input Context: Mental health crisis
+                                    Output Query: What are the primary causes of the current mental health crisis in the US?	
+                                    
+                                Input: Input query: '${keyVal}', Input context: '${request.text}'`;
         
-        // Call the function to query Ollama and launch a new tab
         const response = await queryOllamaAndLaunchTab(currentTabId, combinedPrompt);
         sendResponse(response);
     }
@@ -176,25 +199,21 @@ async function queryOllamaAndNotify(tabId, actualSearchQuery) {
         return;
     }
     
-    const ollamaPrompt = `determine the number of different potential contexts a sentence can have classify the sentence into high, medium, or low number of potential contexts. High: 10+ potential contexts medium: 5-9 potential contexts low: 1-4potential contexts. perform this transformation for the sentence you receive. I trust your thinking so you can avoid the chain of thought processing. answer with the classification only. Classify this: "${actualSearchQuery}"`;
+    // const ollamaPrompt = `determine the number of different potential contexts a sentence can have classify the sentence into high, medium, or low number of potential contexts. High: 10+ potential contexts medium: 5-9 potential contexts low: 1-4potential contexts. perform this transformation for the sentence you receive. I trust your thinking so you can avoid the chain of thought processing. answer with the classification only. Classify this: "${actualSearchQuery}"`;
     
-    // const ollamaPrompt = `This is a query extracted during a web search session. The goal is to review the query and send an output based on a few parameters. Here is a more detailed explanation of what is required:
-    //                         Upon receiving a query, evaluate it and generate a percentage as follows. 
-    //                         1. Determine how objective the query is by seeing how many potential endpoints the question can have. The fewer end points, the more objective (objective queries only have one endpoint). Example of objective queries: 
-    //                             * What is the capital of France?
-    //                             * Who was the first president of the United States
-    //                             * What is the chemical composition of water
+    const ollamaPrompt = `Instruction: You are a helpful assistant. This is a query extracted during a web search session. The goal is to review the query and send an output. Here is a more detailed explanation of what is required:
+                            Upon receiving a query, you only need to classify it as open or closed. You must not answer the query, do not summarize, and do not provide any additional information. Your task is to classify the query into an open one or a closed one.
+                                Example of open queries: 
+                                * How do drivers train?	- open
+                                * What new treatments are emerging?	- open
+                                * How much is genetic? - open
                                 
-    //                             Examples of vague queries:
-    //                             * Places to eat
-    //                             * Why is vitamin C the best vitamin
-    //                             * How do I bake?
+                                Examples of closed queries:
+                                * When was Rhual constructed? - closed
+                                * Which country has topped the swimming medals list in the summer olympics?	- closed
+                                * Who tends to participates in hackathons? - closed
 
-    //                         2. After determining the approximate number of potential endpoints, divide 1 by the number obtained. Subtract it result from 1 and multiply the result by 100
-    //                         3. The queries can be identified with the phrase “Score this: “ in front of the query.
-    //                         4. Respond with the simplified number only
-    //                         5. Important: DO NOT RESPOND WITH ANY TEXT OR EXPLANATION OF THE ANSWER FOR THIS QUERY.
-    //                         Here is the Query, Score this: "${actualSearchQuery}"`;
+                            Input: "${actualSearchQuery}"`;
 
     chrome.action.setBadgeText({ text: '...', tabId: tabId });
     chrome.action.setBadgeBackgroundColor({ color: '#8A2BE2', tabId: tabId });
@@ -213,18 +232,16 @@ async function queryOllamaAndNotify(tabId, actualSearchQuery) {
             const ollamaResponseText = data.response || 'N/A';
             const badgeText = ollamaResponseText.substring(0, 4).toUpperCase();
             
-            if (ollamaResponseText.toLowerCase() == 'high') {
+            if (ollamaResponseText.toLowerCase() == 'open.') {
                 chrome.action.setBadgeText({ text: badgeText, tabId: tabId });
                 chrome.action.setBadgeBackgroundColor({ color: '#f44336', tabId: tabId });
             }
-            else if (ollamaResponseText.toLowerCase() == 'medium') {
-                chrome.action.setBadgeText({ text: badgeText, tabId: tabId });
-                chrome.action.setBadgeBackgroundColor({ color: '#ffd966', tabId: tabId });
-            }
-            else if (ollamaResponseText.toLowerCase() == 'low') { 
+            else if (ollamaResponseText.toLowerCase() == 'closed.') { 
                 chrome.action.setBadgeText({ text: badgeText, tabId: tabId });
                 chrome.action.setBadgeBackgroundColor({ color: '#008000', tabId: tabId });
             }
+
+            console.log(ollamaResponseText)
 
             chrome.notifications.create({
                 type: 'basic',

@@ -10,7 +10,7 @@ CORS(app) # Enable CORS for all origins
 received_data = []
 
 # --- Ollama Configuration ---
-OLLAMA_BASE_URL = 'http://18.219.120.154:3000' # Replace with your Ollama server URL if different
+OLLAMA_BASE_URL = 'http://127.0.0.1:3000' # Replace with your Ollama server URL if different
 OLLAMA_MODEL_NAME = 'llama3.2'               # Replace with the model you want to use (e.g., 'llama2', 'mistral')
 # --- End Ollama Configuration ---
 
