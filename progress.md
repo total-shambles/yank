@@ -59,4 +59,13 @@ So far,
 1) Rework the vague score
 2) Worry about the rest after this is ready to go. Restructure `background.js` for sure though
 
+#### Checkpoints reached as of 8/30 :
+Product ready for deployment.
+
+Current Issues:
+- Finetuning needs more work
+- Dataset needs more values
+- Shift focus to holism
+- Produce a demo
+
 
