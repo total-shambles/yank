@@ -1,13 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "SB_Wiz.pq & Ollama Extractor",
-  "version": "1.0",
-  "description": "Extracts 'sb_wiz.pq', sends a combined query to Ollama, and displays the response.",
+  "name": "Yank",
+  "version": "2.0",
+  "description": "Search query optimizer",
   "permissions": ["tabs", "scripting", "notifications", "storage"],
   "host_permissions": ["<all_urls>", "http://localhost:11434/*"],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "LS & Ollama Extractor"
+    "default_title": "Query Optimizer"
   },
   "icons": {
     "16": "image.png",
