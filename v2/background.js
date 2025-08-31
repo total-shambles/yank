@@ -31,10 +31,7 @@ function getSearchQuery(url) {
     return { isSearch: false, query: null };
 }
 
-// Function to query Ollama and launch a new tab
 async function queryOllamaAndLaunchTab(tabId, combinedPrompt) {
-    // chrome.action.setBadgeText({ text: 'AI..', tabId: tabId });
-    chrome.action.setBadgeBackgroundColor({ color: '#8A2BE2', tabId: tabId });
 
     try {
         const response = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
@@ -50,8 +47,6 @@ async function queryOllamaAndLaunchTab(tabId, combinedPrompt) {
         if (response.ok) {
             const data = await response.json();
             const ollamaResponseText = (data.response || '').trim();
-            console.log(`[Extension] Ollama Prompt: "${combinedPrompt}"`);
-            console.log(`[Extension] Ollama Response: "${ollamaResponseText}"`);
 
             if (ollamaResponseText) {
                 // Encode the response to be a valid URL search query
@@ -61,22 +56,17 @@ async function queryOllamaAndLaunchTab(tabId, combinedPrompt) {
                 // Launch a new tab with the search query
                 await chrome.tabs.create({ url: searchUrl });
 
-                // const badgeText = ollamaResponseText.substring(0, 4).toUpperCase();
-                // chrome.action.setBadgeText({ text: badgeText, tabId: tabId });
-                // chrome.action.setBadgeBackgroundColor({ color: '#008000', tabId: tabId });
             } else {
-                 console.error("[Extension] Ollama returned an empty or invalid response.");
-                //  chrome.action.setBadgeText({ text: 'NoQR', tabId: tabId });
-                //  chrome.action.setBadgeBackgroundColor({ color: '#FF4500', tabId: tabId }); // Orange-red for no query
+                 console.error("[Extension] empty or invalid response.");
             }
 
             return { success: true };
         } else {
             const errorText = await response.text();
-            console.error(`[Extension] Ollama API Error: Status ${response.status}, ${errorText}`);
-            chrome.action.setBadgeText({ text: 'ERR!', tabId: tabId });
+            console.error(`[Extension] API Error: Status ${response.status}, ${errorText}`);
+            chrome.action.setBadgeText({ text: 'ERR', tabId: tabId });
             chrome.action.setBadgeBackgroundColor({ color: '#FF0000', tabId: tabId });
-            return { success: false, error: 'Ollama API error' };
+            return { success: false, error: 'API error' };
         }
     } catch (error) {
         console.error(`[Extension] Failed to connect to Ollama:`, error);
@@ -100,12 +90,12 @@ async function extractLocalStorageValue(tabId, tabUrl) {
         if (results && results[0] && results[0].result !== undefined) {
             const value = results[0].result;
             if (value !== null) {
-                console.log(`[Extension] Local Storage Value for '${KEY_TO_EXTRACT}' on ${tabUrl}: ${value}`);
+                console.log(`Query value on ${tabUrl}: ${value}`);
                 // Store the value in Chrome's local storage for later access by the popup
                 await chrome.storage.local.set({ [KEY_TO_EXTRACT]: value });
                 chrome.notifications.create({
                     type: 'basic',
-                    iconUrl: 'images/icon48.png',
+                    iconUrl: 'image.png',
                     title: `Local Storage Extracted!`,
                     message: `Key value stored for future queries.`
                 });
@@ -114,7 +104,7 @@ async function extractLocalStorageValue(tabId, tabUrl) {
                 await chrome.storage.local.remove(KEY_TO_EXTRACT);
                 chrome.notifications.create({
                     type: 'basic',
-                    iconUrl: 'images/icon48.png',
+                    iconUrl: 'image.png',
                     title: `Local Storage Not Found`,
                     message: `Key '${KEY_TO_EXTRACT}' was not found.`
                 });
@@ -202,16 +192,18 @@ async function queryOllamaAndNotify(tabId, actualSearchQuery) {
     // const ollamaPrompt = `determine the number of different potential contexts a sentence can have classify the sentence into high, medium, or low number of potential contexts. High: 10+ potential contexts medium: 5-9 potential contexts low: 1-4potential contexts. perform this transformation for the sentence you receive. I trust your thinking so you can avoid the chain of thought processing. answer with the classification only. Classify this: "${actualSearchQuery}"`;
     
     const ollamaPrompt = `Instruction: You are a helpful assistant. This is a query extracted during a web search session. The goal is to review the query and send an output. Here is a more detailed explanation of what is required:
-                            Upon receiving a query, you only need to classify it as open or closed. You must not answer the query, do not summarize, and do not provide any additional information. Your task is to classify the query into an open one or a closed one.
+                            Upon receiving a query, you only need to classify it as vague or specific. You must not answer the query, do not summarize, and do not provide any additional information. Your task is to classify the query into a vague one or a specific one. Make sure the output is either: 0 for 'vague' or 1 for 'specific' as is.
                                 Example of open queries: 
-                                * How do drivers train?	- open
-                                * What new treatments are emerging?	- open
-                                * How much is genetic? - open
+                                * Best chromebook?	- vague
+                                * What new treatments are emerging?	- vague
+                                * How much is genetic? - vague
+                                * president - vague
                                 
                                 Examples of closed queries:
-                                * When was Rhual constructed? - closed
-                                * Which country has topped the swimming medals list in the summer olympics?	- closed
-                                * Who tends to participates in hackathons? - closed
+                                * When was Rhual constructed? - specific
+                                * What is an action verb? - specific
+                                * Which country has topped the swimming medals list in the summer olympics?	- specific
+                                * What are the advantages of vitamin C? - specific
 
                             Input: "${actualSearchQuery}"`;
 
@@ -232,12 +224,12 @@ async function queryOllamaAndNotify(tabId, actualSearchQuery) {
             const ollamaResponseText = data.response || 'N/A';
             const badgeText = ollamaResponseText.substring(0, 4).toUpperCase();
             
-            if (ollamaResponseText.toLowerCase() == 'open.') {
-                chrome.action.setBadgeText({ text: badgeText, tabId: tabId });
+            if (ollamaResponseText.toLowerCase() == '0') {
+                chrome.action.setBadgeText({ text: ':(', tabId: tabId });
                 chrome.action.setBadgeBackgroundColor({ color: '#f44336', tabId: tabId });
             }
-            else if (ollamaResponseText.toLowerCase() == 'closed.') { 
-                chrome.action.setBadgeText({ text: badgeText, tabId: tabId });
+            else if (ollamaResponseText.toLowerCase() == '1') { 
+                chrome.action.setBadgeText({ text: ':)', tabId: tabId });
                 chrome.action.setBadgeBackgroundColor({ color: '#008000', tabId: tabId });
             }
 
@@ -245,7 +237,7 @@ async function queryOllamaAndNotify(tabId, actualSearchQuery) {
 
             chrome.notifications.create({
                 type: 'basic',
-                iconUrl: 'images/icon48.png',
+                iconUrl: 'image.png',
                 title: `Ollama Response for: "${actualSearchQuery.substring(0, 50)}..."`,
                 message: `Response: "${ollamaResponseText.substring(0, 100)}..."`
             });
@@ -255,7 +247,7 @@ async function queryOllamaAndNotify(tabId, actualSearchQuery) {
             chrome.action.setBadgeBackgroundColor({ color: '#FF0000', tabId: tabId });
             chrome.notifications.create({
                 type: 'basic',
-                iconUrl: 'images/icon48.png',
+                iconUrl: 'image.png',
                 title: `Ollama Error for: "${actualSearchQuery.substring(0, 50)}..."`,
                 message: `Status: ${response.status}\nError: ${errorText.substring(0, 100)}...`
             });
@@ -265,7 +257,7 @@ async function queryOllamaAndNotify(tabId, actualSearchQuery) {
         chrome.action.setBadgeBackgroundColor({ color: '#FF4500', tabId: tabId });
         chrome.notifications.create({
             type: 'basic',
-            iconUrl: 'images/icon48.png',
+            iconUrl: 'image.png',
             title: `Ollama Connection Error for: "${actualSearchQuery.substring(0, 50)}..."`,
             message: `Could not reach Ollama server. Is it running at ${OLLAMA_BASE_URL}?`
         });

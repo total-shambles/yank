@@ -27,10 +27,6 @@ function getSearchQuery(url) {
         } else if (lowerUrl.includes('yahoo.com/search?')) {
             queryParam = params.get('p'); // Yahoo uses 'p' for its query parameter
         }
-        // Add more search engines here if needed, e.g.,
-        // else if (lowerUrl.includes('ecosia.org/search?q=')) {
-        //     queryParam = params.get('q');
-        // }
 
         if (queryParam) {
             // Decode URI components and replace '+' with spaces for readability
