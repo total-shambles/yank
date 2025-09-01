@@ -16,6 +16,13 @@ This version is built with a focus on chrome.
 *   **Background Monitoring**: Runs in the background, monitoring tab updates and automatically triggering the extraction and query generation process on SERPs. 🕵️‍♂️
 *   **User Feedback**: Provides visual feedback through the extension icon badge, indicating the status of the extraction and query generation process. ℹ️
 
+### Demo
+
+[![Yank Demo](https://youtu.be/CV8-LdcRF10)](https://youtu.be/CV8-LdcRF10)
+
+[<img src="https://youtu.be/CV8-LdcRF10" width="600" height="300"
+/>](https://youtu.be/CV8-LdcRF10)
+
 ### 🛠️ **Tech Stack**
 
 *   **Chrome Extension:**
