@@ -18,10 +18,10 @@ This version is built with a focus on chrome.
 
 ### Demo
 
-[![Yank Demo](https://youtu.be/CV8-LdcRF10)](https://youtu.be/CV8-LdcRF10)
+[![Watch the video](https://img.youtube.com/vi/CV8-LdcRF10/hqdefault.jpg)](https://www.youtube.com/embed/CV8-LdcRF10)
 
-[<img src="https://youtu.be/CV8-LdcRF10" width="600" height="300"
-/>](https://youtu.be/CV8-LdcRF10)
+[<img src="https://img.youtube.com/vi/CV8-LdcRF10/hqdefault.jpg" width="600" height="300"
+/>](https://www.youtube.com/embed/CV8-LdcRF10)
 
 ### 🛠️ **Tech Stack**
 
